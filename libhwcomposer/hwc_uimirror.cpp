@@ -33,7 +33,7 @@ bool UIMirrorOverlay::sIsUiMirroringOn = false;
 
 
 //Prepare the overlay for the UI mirroring
-bool UIMirrorOverlay::prepare(hwc_context_t *ctx, hwc_layer_list_t *list) {
+bool UIMirrorOverlay::prepare(hwc_context_t *ctx, hwc_display_contents_1_t *list) {
     sState = ovutils::OV_CLOSED;
     sIsUiMirroringOn = false;
 
@@ -51,7 +51,7 @@ bool UIMirrorOverlay::prepare(hwc_context_t *ctx, hwc_layer_list_t *list) {
 }
 
 // Configure
-bool UIMirrorOverlay::configure(hwc_context_t *ctx, hwc_layer_list_t *list)
+bool UIMirrorOverlay::configure(hwc_context_t *ctx, hwc_display_contents_1_t *list)
 {
     if (LIKELY(ctx->mOverlay)) {
         overlay::Overlay& ov = *(ctx->mOverlay);
