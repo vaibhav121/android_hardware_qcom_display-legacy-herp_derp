@@ -35,7 +35,7 @@
 #include <cutils/log.h>
 #include <binder/IServiceManager.h>
 #include <ihwc.h>
-#include <hwc_external.h>
+#include "external.h"
 
 
 namespace hwcService {

@@ -24,7 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "hwc_utils.h"
-#include "hwc_external.h"
+#include "external.h"
 
 #define PAGE_SIZE 4096
 

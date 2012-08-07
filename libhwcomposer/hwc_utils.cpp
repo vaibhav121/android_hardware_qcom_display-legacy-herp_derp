@@ -25,11 +25,12 @@
 #include "hwc_video.h"
 #include "hwc_qbuf.h"
 #include "hwc_copybit.h"
-#include "hwc_external.h"
+#include "external.h"
 #include "hwc_mdpcomp.h"
 #include "hwc_extonly.h"
 #include "hwc_service.h"
 #include "comptype.h"
+#include "QService.h"
 
 namespace qhwc {
 
@@ -48,6 +49,7 @@ void initContext(hwc_context_t *ctx)
     qdutils::QCCompositionType::getInstance().changeTargetCompositionType(
               ctx->mFbDev->width,ctx->mFbDev->height);
     ctx->mOverlay = overlay::Overlay::getInstance();
+    ctx->mQService = qService::QService::getInstance(ctx);
     ctx->mHwcService = hwcService::HWComposerService::getInstance();
     ctx->mHwcService->setHwcContext(ctx);
     ctx->qbuf = new QueuedBufferStore();

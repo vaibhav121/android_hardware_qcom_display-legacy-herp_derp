@@ -19,7 +19,7 @@
 #include <overlay.h>
 #include "hwc_qbuf.h"
 #include "hwc_video.h"
-#include "hwc_external.h"
+#include "external.h"
 #include "qdMetaData.h"
 
 namespace qhwc {

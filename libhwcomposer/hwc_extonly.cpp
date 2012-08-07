@@ -16,7 +16,7 @@
  */
 
 #include "hwc_extonly.h"
-#include "hwc_external.h"
+#include "external.h"
 #include "hwc_qbuf.h"
 
 namespace qhwc {

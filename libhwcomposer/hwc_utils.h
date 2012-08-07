@@ -31,6 +31,10 @@
 struct hwc_context_t;
 struct framebuffer_device_t;
 
+namespace qService {
+class QService;
+}
+
 namespace hwcService {
 class HWComposerService;
 }
@@ -162,6 +166,9 @@ struct hwc_context_t {
     //QueuedBufferStore to hold buffers for overlay
     qhwc::QueuedBufferStore *qbuf;
 
+    //QService object
+    qService::QService *mQService;
+
     //HWComposerService object
     hwcService::HWComposerService *mHwcService;
 
@@ -174,6 +181,12 @@ struct hwc_context_t {
     struct vsync_state vstate;
 
     bool isPoweredDown;
+
+    //Securing in progress indicator
+    bool mSecuring;
+
+    //Display in secure mode indicator
+    bool mSecureMode;
 };
 
 #endif //HWC_UTILS_H

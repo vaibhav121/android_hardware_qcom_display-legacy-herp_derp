@@ -4,7 +4,7 @@
 ifeq ($(call is-vendor-board-platform,QCOM),true)
 ifeq ($(TARGET_QCOM_DISPLAY_VARIANT),legacy)
 display-hals := libgralloc libgenlock libcopybit
-display-hals += libhwcomposer liboverlay libqdutils
+display-hals += libhwcomposer liboverlay libqdutils libexternal libqservice
 endif
 endif
 

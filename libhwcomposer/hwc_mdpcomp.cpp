@@ -20,7 +20,7 @@
 #include <mdp_version.h>
 #include "hwc_mdpcomp.h"
 #include "hwc_qbuf.h"
-#include "hwc_external.h"
+#include "external.h"
 
 #define SUPPORT_4LAYER 0
 

@@ -26,7 +26,7 @@
 #include <sys/resource.h>
 #include <sys/prctl.h>
 #include "hwc_utils.h"
-#include "hwc_external.h"
+#include "external.h"
 #include "string.h"
 
 #define PAGE_SIZE 4096

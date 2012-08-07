@@ -33,6 +33,8 @@ class UIMirrorOverlay {
         static bool prepare(hwc_context_t *ctx, hwc_display_contents_1_t *list);
         // Draws layer if this feature is on
         static bool draw(hwc_context_t *ctx);
+        //Reset values
+        static void reset();
     private:
         //Configures overlay
         static bool configure(hwc_context_t *ctx, hwc_display_contents_1_t *list);
