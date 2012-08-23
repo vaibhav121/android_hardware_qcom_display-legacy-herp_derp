@@ -99,6 +99,10 @@ private:
     const NoCopy& operator=(const NoCopy&);
 };
 
+#ifndef MDP_Y_CBCR_H2V2_VENUS
+#define MDP_Y_CBCR_H2V2_VENUS (MDP_IMGTYPE_LIMIT2 + 1)
+#endif
+
 /*
 * Utility class to query the framebuffer info for primary display
 *
@@ -553,6 +557,7 @@ inline bool isYuv(uint32_t format) {
         case MDP_Y_CBCR_H2V2_TILE:
         case MDP_Y_CR_CB_H2V2:
         case MDP_Y_CR_CB_GH2V2:
+        case MDP_Y_CBCR_H2V2_VENUS:
             return true;
         default:
             return false;
@@ -610,6 +615,8 @@ inline const char* getFormatString(int format){
         "MDP_YCRCB_H1V1",
         "MDP_YCBCR_H1V1",
         "MDP_BGR_565",
+        "MDP_BGR_888",
+        "MDP_Y_CBCR_H2V2_VENUS",
         "MDP_IMGTYPE_LIMIT",
         "MDP_RGB_BORDERFILL",
         "MDP_FB_FORMAT",
