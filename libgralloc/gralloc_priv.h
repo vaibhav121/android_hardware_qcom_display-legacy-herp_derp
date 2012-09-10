@@ -201,7 +201,7 @@ struct private_handle_t : public native_handle {
         // The gpu address mapped into the mmu.
         // If using ashmem, set to 0, they don't care
         int     gpuaddr;
-        int     pid;
+        int     pid;   // deprecated
         int     format;
         int     width;
         int     height;
