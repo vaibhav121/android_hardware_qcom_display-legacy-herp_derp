@@ -173,6 +173,7 @@ struct hwc_context_t {
     //Vsync
     struct vsync_state vstate;
 
+    bool isPoweredDown;
 };
 
 #endif //HWC_UTILS_H
