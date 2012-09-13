@@ -88,18 +88,17 @@ static int hwc_prepare(hwc_composer_device_1 *dev, size_t numDisplays,
     if(ctx->mExtDisplay->getExternalDisplay())
         ovutils::setExtType(ctx->mExtDisplay->getExternalDisplay());
 
-    if(ctx->isPoweredDown) {
-        ALOGW("SurfaceFlinger called %s after a POWERDOWN", __FUNCTION__);
-    }
-
-    for (uint32_t i = 0; i <numDisplays; i++) {
-        hwc_display_contents_1_t* list = displays[i];
-        ctx->dpys[i] = list->dpy;
+    for (uint32_t i = 0; i < numDisplays; i++) {
+        hwc_display_contents_1_t *list = displays[i];
         //XXX: Actually handle the multiple displays
-        if (LIKELY(list)) {
+        if (LIKELY(list && list->numHwLayers)) {
+            ctx->dpys[i] = list->dpy;
             //reset for this draw round
             VideoOverlay::reset();
             ExtOnly::reset();
+
+            if(ctx->isPoweredDown)
+                ALOGW("SF called %s after a POWERDOWN", __FUNCTION__);
 
             getLayerStats(ctx, list);
             // Mark all layers to COPYBIT initially
