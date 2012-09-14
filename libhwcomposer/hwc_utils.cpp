@@ -151,6 +151,7 @@ void getLayerStats(hwc_context_t *ctx, const hwc_display_contents_1_t *list)
             //Animating
             if (isSkipLayer(&list->hwLayers[i])) {
                 isYuvLayerSkip = true;
+                skipCount++;
             }
         } else if(UNLIKELY(isExtCC(hnd))) {
             ccLayerIndex = i;
@@ -160,9 +161,7 @@ void getLayerStats(hwc_context_t *ctx, const hwc_display_contents_1_t *list)
             isExtBlockPresent = true;
         } else if(UNLIKELY(isExtOnly(hnd))) {
             extCount++;
-            //If BLOCK layer present, dont cache index, display BLOCK only.
-            if(isExtBlockPresent == false) extLayerIndex = i;
-        } else if (isSkipLayer(&list->hwLayers[i])) { //Popups
+            } else if (isSkipLayer(&list->hwLayers[i])) {
             skipCount++;
         }
     }
