@@ -79,6 +79,16 @@ static void hwc_registerProcs(struct hwc_composer_device_1* dev,
     init_vsync_thread(ctx);
 }
 
+//Helper
+static void reset() {
+    //reset for this draw round
+    VideoOverlay::reset();
+    ExtOnly::reset();
+    UIMirrorOverlay::reset();
+    ExtOnly::reset();
+    //TODO MDPComp
+}
+
 static int hwc_prepare(hwc_composer_device_1 *dev, size_t numDisplays,
                        hwc_display_contents_1_t** displays)
 {
@@ -88,10 +98,7 @@ static int hwc_prepare(hwc_composer_device_1 *dev, size_t numDisplays,
     if(ctx->mExtDisplay->getExternalDisplay())
         ovutils::setExtType(ctx->mExtDisplay->getExternalDisplay());
 
-    //reset for this draw round
-    VideoOverlay::reset();
-    ExtOnly::reset();
-    UIMirrorOverlay::reset();
+    reset();
 
     //If securing of h/w in progress skip comp using overlay.
     if(ctx->mSecuring == true) return 0;

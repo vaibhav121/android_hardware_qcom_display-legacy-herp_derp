@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define DEBUG 0
+#define UEVENT_DEBUG 0
 #include <hardware_legacy/uevent.h>
 #include <utils/Log.h>
 #include <sys/resource.h>
@@ -37,7 +37,7 @@ static void handle_uevent(hwc_context_t* ctx, const char* udata, int len)
     const char *str = udata;
 
     if(!strcasestr(str, "@/devices/virtual/graphics/fb")) {
-        ALOGD_IF(DEBUG, "%s: Not Ext Disp Event ", __FUNCTION__);
+        ALOGD_IF(UEVENT_DEBUG, "%s: Not Ext Disp Event ", __FUNCTION__);
         return;
     }
 
