@@ -256,6 +256,10 @@ static int hwc_set(hwc_composer_device_1 *dev,
                 CopyBit::draw(ctx, list, (EGLDisplay)list->dpy, (EGLSurface)list->sur);
                 MDPComp::draw(ctx, list);
             }
+
+            //Sync TODO better error handling.
+            hwc_sync(list);
+
             eglSwapBuffers((EGLDisplay)list->dpy, (EGLSurface)list->sur);
             if (ctx->mMDP.hasOverlay) {
                 wait4fbPost(ctx);
