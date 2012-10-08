@@ -138,8 +138,10 @@ void MDPComp::reset_comp_type(hwc_layer_list_t* list) {
 
 void MDPComp::reset( hwc_context_t *ctx, hwc_layer_list_t* list ) {
     sCurrentFrame.count = 0;
-    free(sCurrentFrame.pipe_layer);
-    sCurrentFrame.pipe_layer = NULL;
+    if(sCurrentFrame.pipe_layer) {
+        free(sCurrentFrame.pipe_layer);
+        sCurrentFrame.pipe_layer = NULL;
+    }
 
     //Reset MDP pipes
     sPipeMgr.reset();
@@ -613,6 +615,11 @@ bool MDPComp::setup(hwc_context_t* ctx, hwc_layer_list_t* list) {
 
     frame_info &current_frame = sCurrentFrame;
     current_frame.count = 0;
+
+    if(current_frame.pipe_layer) {
+        free(current_frame.pipe_layer);
+        current_frame.pipe_layer = NULL;
+    }
 
     if(!ctx) {
        ALOGE("%s: invalid context", __FUNCTION__);
