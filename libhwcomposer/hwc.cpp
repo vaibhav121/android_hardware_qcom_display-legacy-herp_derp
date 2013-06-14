@@ -95,7 +95,6 @@ static int hwc_prepare(hwc_composer_device_1 *dev, size_t numDisplays,
         if (LIKELY(list)) {
             //reset for this draw round
             VideoOverlay::reset();
-            VideoPIP::reset();
             ExtOnly::reset();
 
             getLayerStats(ctx, list);
@@ -227,7 +226,6 @@ static int hwc_set(hwc_composer_device_1 *dev,
         if (list->dpy && list->sur) {
             if (LIKELY(list)) {
                 VideoOverlay::draw(ctx, list);
-                VideoPIP::draw(ctx,list);
                 ExtOnly::draw(ctx, list);
                 CopyBit::draw(ctx, list, (EGLDisplay)list->dpy, (EGLSurface)list->sur);
                 MDPComp::draw(ctx, list);
