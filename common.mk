@@ -14,6 +14,8 @@ ifeq ($(TARGET_USES_POST_PROCESSING),true)
 endif
 
 
+common_header_export_path := qcom/display-legacy
+
 #Common libraries external to display-legacy HAL
 common_libs := liblog libutils libcutils libhardware
 
