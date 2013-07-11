@@ -1,6 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- * Copyright (c) 2010 - 2011, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2010 - 2013, The Linux Foundation. All rights reserved.
+ *
+ * Not a Contribution, Apache license notifications and license are retained
+ * for attribution purposes only.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +17,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-#define LOG_TAG "copybit"
 
 #include <cutils/log.h>
 
@@ -323,10 +323,10 @@ static int set_parameter_copybit(
                     ctx->mFlags &= ~MDP_BLUR;
                 }
                 break;
-            case COPYBIT_PREMULTIPLIED_ALPHA:
-                if(value == COPYBIT_ENABLE) {
+            case COPYBIT_BLEND_MODE:
+                if(value == COPYBIT_BLENDING_PREMULT) {
                     ctx->mFlags |= MDP_BLEND_FG_PREMULT;
-                } else if (value == COPYBIT_DISABLE) {
+                } else {
                     ctx->mFlags &= ~MDP_BLEND_FG_PREMULT;
                 }
                 break;
@@ -344,7 +344,7 @@ static int set_parameter_copybit(
                             __FUNCTION__, value);
                 }
                 break;
-           case COPYBIT_FG_LAYER:
+            case COPYBIT_FG_LAYER:
                if(value == COPYBIT_ENABLE) {
                     ctx->mFlags |= MDP_IS_FG;
                 } else if (value == COPYBIT_DISABLE) {
@@ -519,6 +519,12 @@ static int blit_copybit(
     return stretch_copybit(dev, dst, src, &dr, &sr, region);
 }
 
+static int finish_copybit(struct copybit_device_t *dev)
+{
+    // NOP for MDP copybit
+    return 0;
+}
+
 /*****************************************************************************/
 
 /** Close the copybit device */
@@ -549,6 +555,7 @@ static int open_copybit(const struct hw_module_t* module, const char* name,
     ctx->device.get = get;
     ctx->device.blit = blit_copybit;
     ctx->device.stretch = stretch_copybit;
+    ctx->device.finish = finish_copybit;
     ctx->mAlpha = MDP_ALPHA_NOP;
     ctx->mFlags = 0;
     ctx->mFD = open("/dev/graphics/fb0", O_RDWR, 0);
