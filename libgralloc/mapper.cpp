@@ -387,7 +387,6 @@ int gralloc_perform(struct gralloc_module_t const* module,
                 res = 0;
             }
             break;
-#endif
         case GRALLOC_MODULE_PERFORM_GET_STRIDE:
             {
                 int width   = va_arg(args, int);
