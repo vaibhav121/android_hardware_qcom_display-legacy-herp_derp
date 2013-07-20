@@ -79,13 +79,6 @@ enum {
      * but still need to be protected from screen captures
      */
     GRALLOC_USAGE_PRIVATE_CP_BUFFER       =       0x00400000,
-
-    /* Legacy heaps - these heaps are no-ops so we are making them zero
-     * The flags need to be around to compile certain HALs which have
-     * not cleaned up the code
-     */
-    GRALLOC_USAGE_PRIVATE_ADSP_HEAP       =       0x0,
-    GRALLOC_USAGE_PRIVATE_SMI_HEAP        =       0x0,
 };
 
 enum {
@@ -101,6 +94,8 @@ enum {
                              GRALLOC_USAGE_PRIVATE_MM_HEAP        |\
                              GRALLOC_USAGE_PRIVATE_CAMERA_HEAP)
 
+#define INTERLACE_MASK 0x80
+#define S3D_FORMAT_MASK 0xFF000
 /*****************************************************************************/
 enum {
     /* OEM specific HAL formats */
