@@ -71,10 +71,9 @@ static bool canFallback(int usage, bool triedSystem)
 
 static bool useUncached(int usage)
 {
-    // System heaps cannot be uncached
-    if(usage & GRALLOC_USAGE_PRIVATE_SYSTEM_HEAP)
-        return false;
-    if (usage & GRALLOC_USAGE_PRIVATE_UNCACHED)
+    if (usage & GRALLOC_USAGE_PRIVATE_UNCACHED ||
+        usage & GRALLOC_USAGE_SW_WRITE_RARELY  ||
+        usage & GRALLOC_USAGE_SW_READ_RARELY)
         return true;
     return false;
 }
@@ -116,7 +115,7 @@ int AdrenoMemInfo::getStride(int width, int format)
         }
         if ((libadreno_utils) && (LINK_adreno_compute_padding)) {
             int surface_tile_height = 1;   // Linear surface
-            int raster_mode         = 1;   // Adreno TW raster mode.
+            int raster_mode         = 0;   // Adreno unknown raster mode.
             int padding_threshold   = 512; // Threshold for padding surfaces.
             // the function below expects the width to be a multiple of
             // 32 pixels, hence we pass stride instead of width.
@@ -128,6 +127,7 @@ int AdrenoMemInfo::getStride(int width, int format)
         switch (format)
         {
             case HAL_PIXEL_FORMAT_YCrCb_420_SP_ADRENO:
+            case HAL_PIXEL_FORMAT_RAW_SENSOR:
                 stride = ALIGN(width, 32);
                 break;
             case HAL_PIXEL_FORMAT_YCbCr_420_SP_TILED:
@@ -143,6 +143,9 @@ int AdrenoMemInfo::getStride(int width, int format)
                 break;
             case HAL_PIXEL_FORMAT_YCbCr_420_SP_VENUS:
                 stride = VENUS_Y_STRIDE(COLOR_FMT_NV12, width);
+                break;
+            case HAL_PIXEL_FORMAT_BLOB:
+                stride = width;
                 break;
             default: break;
         }
@@ -260,6 +263,7 @@ size_t getBufferSizeAndDimensions(int width, int height, int format,
         case HAL_PIXEL_FORMAT_RGB_565:
         case HAL_PIXEL_FORMAT_RGBA_5551:
         case HAL_PIXEL_FORMAT_RGBA_4444:
+        case HAL_PIXEL_FORMAT_RAW_SENSOR:
             size = alignedw * alignedh * 2;
             break;
 
@@ -309,6 +313,16 @@ size_t getBufferSizeAndDimensions(int width, int height, int format,
         case HAL_PIXEL_FORMAT_YCbCr_420_SP_VENUS:
             alignedh = VENUS_Y_SCANLINES(COLOR_FMT_NV12, height);
             size = VENUS_BUFFER_SIZE(COLOR_FMT_NV12, width, height);
+            break;
+        case HAL_PIXEL_FORMAT_BLOB:
+            if(height != 1) {
+                ALOGE("%s: Buffers with format HAL_PIXEL_FORMAT_BLOB \
+                      must have height==1 ", __FUNCTION__);
+                return -EINVAL;
+            }
+            alignedh = height;
+            alignedw = width;
+            size = width;
             break;
         default:
             ALOGE("unrecognized pixel format: 0x%x", format);

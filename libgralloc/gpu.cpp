@@ -179,18 +179,42 @@ int gpu_context_t::gralloc_alloc_buffer(size_t size, int usage,
             }
         }
 
-    if (usage & GRALLOC_USAGE_HW_VIDEO_ENCODER ) {
-        flags |= private_handle_t::PRIV_FLAGS_VIDEO_ENCODER;
-    }
+        if (bufferType == BUFFER_TYPE_VIDEO) {
+            if (usage & GRALLOC_USAGE_HW_CAMERA_WRITE) {
+                if ((qdutils::MDPVersion::getInstance().getMDPVersion() <
+                     qdutils::MDSS_V5)) { //A-Family
+                    flags |= private_handle_t::PRIV_FLAGS_ITU_R_601_FR;
+                } else {
+                    if (usage & (GRALLOC_USAGE_HW_TEXTURE |
+                                 GRALLOC_USAGE_HW_VIDEO_ENCODER))
+                        flags |= private_handle_t::PRIV_FLAGS_ITU_R_709;
+                    else if (usage & GRALLOC_USAGE_HW_CAMERA_ZSL)
+                        flags |= private_handle_t::PRIV_FLAGS_ITU_R_601_FR;
+                }
+            } else {
+                flags |= private_handle_t::PRIV_FLAGS_ITU_R_601;
+            }
+        }
 
-    if (usage & GRALLOC_USAGE_HW_CAMERA_WRITE) {
-        flags |= private_handle_t::PRIV_FLAGS_CAMERA_WRITE;
-    }
+        if (usage & GRALLOC_USAGE_HW_VIDEO_ENCODER ) {
+            flags |= private_handle_t::PRIV_FLAGS_VIDEO_ENCODER;
+        }
 
-    if (usage & GRALLOC_USAGE_HW_CAMERA_READ) {
-        flags |= private_handle_t::PRIV_FLAGS_CAMERA_READ;
-    }
+        if (usage & GRALLOC_USAGE_HW_CAMERA_WRITE) {
+            flags |= private_handle_t::PRIV_FLAGS_CAMERA_WRITE;
+        }
 
+        if (usage & GRALLOC_USAGE_HW_CAMERA_READ) {
+            flags |= private_handle_t::PRIV_FLAGS_CAMERA_READ;
+        }
+
+        if (usage & GRALLOC_USAGE_HW_COMPOSER) {
+            flags |= private_handle_t::PRIV_FLAGS_HW_COMPOSER;
+        }
+
+        if (usage & GRALLOC_USAGE_HW_TEXTURE) {
+            flags |= private_handle_t::PRIV_FLAGS_HW_TEXTURE;
+        }
 
         flags |= data.allocType;
         int eBaseAddr = int(eData.base) + eData.offset;
@@ -235,9 +259,10 @@ int gpu_context_t::alloc_impl(int w, int h, int format, int usage,
 
     //If input format is HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED then based on
     //the usage bits, gralloc assigns a format.
-    if(format == HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED) {
+    if(format == HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED ||
+       format == HAL_PIXEL_FORMAT_YCbCr_420_888) {
         if(usage & GRALLOC_USAGE_HW_VIDEO_ENCODER)
-            grallocFormat = HAL_PIXEL_FORMAT_YCbCr_420_SP; //NV12
+            grallocFormat = HAL_PIXEL_FORMAT_NV12_ENCODEABLE; //NV12
         else if(usage & GRALLOC_USAGE_HW_CAMERA_READ)
             grallocFormat = HAL_PIXEL_FORMAT_YCrCb_420_SP; //NV21
         else if(usage & GRALLOC_USAGE_HW_CAMERA_WRITE)

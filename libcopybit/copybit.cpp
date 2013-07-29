@@ -127,10 +127,10 @@ static int get_format(int format) {
         case HAL_PIXEL_FORMAT_RGB_888:       return MDP_RGB_888;
         case HAL_PIXEL_FORMAT_RGBA_8888:     return MDP_RGBA_8888;
         case HAL_PIXEL_FORMAT_BGRA_8888:     return MDP_BGRA_8888;
-        case HAL_PIXEL_FORMAT_YCrCb_422_SP:  return MDP_Y_CBCR_H2V1;
-        case HAL_PIXEL_FORMAT_YCrCb_420_SP:  return MDP_Y_CBCR_H2V2;
-        case HAL_PIXEL_FORMAT_YCbCr_422_SP:  return MDP_Y_CRCB_H2V1;
-        case HAL_PIXEL_FORMAT_YCbCr_420_SP:  return MDP_Y_CRCB_H2V2;
+        case HAL_PIXEL_FORMAT_YCrCb_422_SP:  return MDP_Y_CRCB_H2V1;
+        case HAL_PIXEL_FORMAT_YCrCb_420_SP:  return MDP_Y_CRCB_H2V2;
+        case HAL_PIXEL_FORMAT_YCbCr_422_SP:  return MDP_Y_CBCR_H2V1;
+        case HAL_PIXEL_FORMAT_YCbCr_420_SP:  return MDP_Y_CBCR_H2V2;
         case HAL_PIXEL_FORMAT_YCrCb_420_SP_ADRENO: return MDP_Y_CBCR_H2V2_ADRENO;
         case HAL_PIXEL_FORMAT_NV12_ENCODEABLE: return MDP_Y_CBCR_H2V2;
     }
@@ -166,12 +166,6 @@ static void set_rects(struct copybit_context_t *dev,
     e->dst_rect.y  = clip.t;
     e->dst_rect.w  = clip.r - clip.l;
     e->dst_rect.h  = clip.b - clip.t;
-    //MDP3 can't handle the odd dst width and height
-    // hence making even
-    e->dst_rect.x =  (e->dst_rect.x/2)*2;
-    e->dst_rect.y =  (e->dst_rect.y/2)*2;
-    e->dst_rect.w =  (e->dst_rect.w/2)*2;
-    e->dst_rect.h =  (e->dst_rect.h/2)*2;
 
     uint32_t W, H, delta_x, delta_y;
     if (dev->mFlags & COPYBIT_TRANSFORM_ROT_90) {
@@ -514,8 +508,8 @@ static int blit_copybit(
     struct copybit_image_t const *src,
     struct copybit_region_t const *region)
 {
-    struct copybit_rect_t dr = { 0, 0, (int)dst->w, (int)dst->h };
-    struct copybit_rect_t sr = { 0, 0, (int)src->w, (int)src->h };
+    struct copybit_rect_t dr = { 0, 0, dst->w, dst->h };
+    struct copybit_rect_t sr = { 0, 0, src->w, src->h };
     return stretch_copybit(dev, dst, src, &dr, &sr, region);
 }
 
