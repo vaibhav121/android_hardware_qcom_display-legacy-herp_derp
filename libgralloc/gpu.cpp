@@ -179,18 +179,17 @@ int gpu_context_t::gralloc_alloc_buffer(size_t size, int usage,
             }
         }
 
-    if (usage & GRALLOC_USAGE_HW_VIDEO_ENCODER ) {
-        flags |= private_handle_t::PRIV_FLAGS_VIDEO_ENCODER;
-    }
+        if (usage & GRALLOC_USAGE_HW_VIDEO_ENCODER ) {
+            flags |= private_handle_t::PRIV_FLAGS_VIDEO_ENCODER;
+        }
 
-    if (usage & GRALLOC_USAGE_HW_CAMERA_WRITE) {
-        flags |= private_handle_t::PRIV_FLAGS_CAMERA_WRITE;
-    }
+        if (usage & GRALLOC_USAGE_HW_CAMERA_WRITE) {
+            flags |= private_handle_t::PRIV_FLAGS_CAMERA_WRITE;
+        }
 
-    if (usage & GRALLOC_USAGE_HW_CAMERA_READ) {
-        flags |= private_handle_t::PRIV_FLAGS_CAMERA_READ;
-    }
-
+        if (usage & GRALLOC_USAGE_HW_CAMERA_READ) {
+            flags |= private_handle_t::PRIV_FLAGS_CAMERA_READ;
+        }
 
         flags |= data.allocType;
         int eBaseAddr = int(eData.base) + eData.offset;
