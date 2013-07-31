@@ -317,10 +317,10 @@ static int set_parameter_copybit(
                     ctx->mFlags &= ~MDP_BLUR;
                 }
                 break;
-            case COPYBIT_BLEND_MODE:
-                if(value == COPYBIT_BLENDING_PREMULT) {
+            case COPYBIT_PREMULTIPLIED_ALPHA:
+                if(value == COPYBIT_ENABLE) {
                     ctx->mFlags |= MDP_BLEND_FG_PREMULT;
-                } else {
+                } else if (value == COPYBIT_DISABLE) {
                     ctx->mFlags &= ~MDP_BLEND_FG_PREMULT;
                 }
                 break;

@@ -71,8 +71,9 @@ enum {
     /* blurs the copied bitmap. The amount of blurring cannot be changed
      * at this time. */
     COPYBIT_BLUR            = 5,
-    /* Blend mode */
-    COPYBIT_BLEND_MODE  = 6,
+    /* Informs the copybit that the source and destination contains
+       premultiplied alpha */
+    COPYBIT_PREMULTIPLIED_ALPHA  = 6,
     /* FB width */
     COPYBIT_FRAMEBUFFER_WIDTH = 7,
     /* FB height */
