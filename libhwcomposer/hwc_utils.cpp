@@ -264,6 +264,7 @@ void wait4Pan(hwc_context_t* ctx) {
 
 int hwc_sync(hwc_display_contents_1_t* list) {
     int ret = 0;
+#ifdef USE_FENCE_SYNC
     struct mdp_buf_sync data;
     int acquireFd[10];
     int count = 0;
@@ -313,6 +314,7 @@ int hwc_sync(hwc_display_contents_1_t* list) {
         if (releaseFd != -1)
             close(releaseFd);
     }
+#endif
     return ret;
 }
 
