@@ -41,9 +41,6 @@
 #include "gr.h"
 #include "comptype.h"
 
-ANDROID_SINGLETON_STATIC_INSTANCE(qdutils::QCCompositionType);
-
-
 #ifdef VENUS_COLOR_FORMAT
 #include <media/msm_media_info.h>
 #else
@@ -56,16 +53,13 @@ using namespace gralloc;
 using namespace qdutils;
 using android::sp;
 
-
 const int GRALLOC_HEAP_MASK  =  GRALLOC_USAGE_PRIVATE_ADSP_HEAP      |
                                 GRALLOC_USAGE_PRIVATE_UI_CONTIG_HEAP |
-                                GRALLOC_USAGE_PRIVATE_SMI_HEAP       |
                                 GRALLOC_USAGE_PRIVATE_SYSTEM_HEAP    |
                                 GRALLOC_USAGE_PRIVATE_IOMMU_HEAP     |
                                 GRALLOC_USAGE_PRIVATE_MM_HEAP        |
                                 GRALLOC_USAGE_PRIVATE_WRITEBACK_HEAP |
                                 GRALLOC_USAGE_PRIVATE_CAMERA_HEAP;
-
 
 ANDROID_SINGLETON_STATIC_INSTANCE(AdrenoMemInfo);
 
@@ -193,8 +187,7 @@ IonController::IonController()
 #endif
 }
 
-int IonController::allocate(alloc_data& data, int usage, 
-									int compositionType)
+int IonController::allocate(alloc_data& data, int usage)
 {
     int ionFlags = 0;
     int ret;
@@ -202,7 +195,6 @@ int IonController::allocate(alloc_data& data, int usage,
 
     data.uncached = useUncached(usage);
     data.allocType = 0;
-
 
 #ifdef USE_PMEM_ADSP
     if (usage & GRALLOC_USAGE_PRIVATE_ADSP_HEAP) {
@@ -228,10 +220,8 @@ int IonController::allocate(alloc_data& data, int usage,
     if(usage & GRALLOC_USAGE_PRIVATE_MM_HEAP)
         ionFlags |= ION_HEAP(ION_CP_MM_HEAP_ID);
 
-
     if(usage & GRALLOC_USAGE_PRIVATE_WRITEBACK_HEAP)
         ionFlags |= ION_HEAP(ION_CP_WB_HEAP_ID);
-
 
     if(usage & GRALLOC_USAGE_PRIVATE_CAMERA_HEAP)
         ionFlags |= ION_HEAP(ION_CAMERA_HEAP_ID);
@@ -243,7 +233,6 @@ int IonController::allocate(alloc_data& data, int usage,
         data.allocType  |=  private_handle_t::PRIV_FLAGS_NOT_MAPPED;
     else
         data.allocType  &=  ~(private_handle_t::PRIV_FLAGS_NOT_MAPPED);
-
 
     // if no flags are set, default to
     // SF + IOMMU heaps, so that bypass can work
@@ -397,7 +386,7 @@ int alloc_buffer(private_handle_t **pHnd, int w, int h, int format, int usage)
     data.uncached = useUncached(usage);
     int allocFlags = usage;
 
-    int err = sAlloc->allocate(data, allocFlags, 0);
+    int err = sAlloc->allocate(data, allocFlags);
     if (0 != err) {
         ALOGE("%s: allocate failed", __FUNCTION__);
         return -ENOMEM;
