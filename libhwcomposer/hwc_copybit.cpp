@@ -408,7 +408,7 @@ int  CopyBit::drawLayerUsingCopybit(hwc_context_t *dev, hwc_layer_1_t *layer,
 
        int usage = GRALLOC_USAGE_PRIVATE_MM_HEAP|GRALLOC_USAGE_PRIVATE_UNCACHED;
        if(dev->mMDP.version < 400)
-          usage = GRALLOC_USAGE_PRIVATE_ADSP_HEAP|GRALLOC_USAGE_PRIVATE_UNCACHED;
+          usage = GRALLOC_USAGE_PRIVATE_CAMERA_HEAP|GRALLOC_USAGE_PRIVATE_UNCACHED;
        if (0 == alloc_buffer(&tmpHnd, tmp_w, tmp_h, HAL_PIXEL_FORMAT_RGB_565, usage)){
             copybit_image_t tmp_dst;
             copybit_rect_t tmp_rect;
