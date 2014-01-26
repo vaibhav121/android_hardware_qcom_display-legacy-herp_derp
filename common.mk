@@ -37,6 +37,10 @@ ifeq ($(TARGET_BOARD_PLATFORM), msm8974)
     common_flags += -DVENUS_COLOR_FORMAT
 endif
 
+ifeq ($(TARGET_NO_HW_VSYNC),true)
+    common_flags += -DNO_HW_VSYNC
+endif
+
 common_deps  :=
 kernel_includes :=
 

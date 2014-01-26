@@ -90,6 +90,7 @@ static void *vsync_loop(void *param)
     hwc_procs* proc = (hwc_procs*)ctx->device.reserved_proc[0];
 
     do {
+#ifndef NO_HW_VSYNC
         int hdmiconnected = ctx->mExtDisplay->getExternalDisplay();
 
         // vsync for primary OR HDMI ?
@@ -174,6 +175,10 @@ static void *vsync_loop(void *param)
         ALOGD_IF(VSYNC_DEBUG, "%s: timestamp %llu sent to HWC for %s",
               __FUNCTION__, cur_timestamp, (fb1_vsync) ? "fb1" : "fb0");
         ctx->proc->vsync(ctx->proc, 0, cur_timestamp);
+#else
+    usleep(16000);
+    ctx->proc->vsync(ctx->proc, 0, systemTime());
+#endif
       // repeat, whatever, you just did
     } while (true);
 
