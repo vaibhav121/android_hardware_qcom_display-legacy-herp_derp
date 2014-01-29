@@ -44,15 +44,14 @@
 #include "memalloc.h"
 
 using namespace gralloc;
-using android::sp;
 /*****************************************************************************/
 
 // Return the type of allocator -
 // these are used for mapping/unmapping
-static sp<IMemAlloc> getAllocator(int flags)
+static IMemAlloc* getAllocator(int flags)
 {
-    sp<IMemAlloc> memalloc;
-    sp<IAllocController> alloc_ctrl = IAllocController::getInstance(true);
+    IMemAlloc* memalloc;
+    IAllocController* alloc_ctrl = IAllocController::getInstance();
     memalloc = alloc_ctrl->getAllocator(flags);
     return memalloc;
 }
@@ -65,7 +64,7 @@ static int gralloc_map(gralloc_module_t const* module,
     if (!(hnd->flags & private_handle_t::PRIV_FLAGS_FRAMEBUFFER) &&
         !(hnd->flags & private_handle_t::PRIV_FLAGS_SECURE_BUFFER)) {
         size_t size = hnd->size;
-        sp<IMemAlloc> memalloc = getAllocator(hnd->flags) ;
+        IMemAlloc* memalloc = getAllocator(hnd->flags) ;
         int err = memalloc->map_buffer(&mappedAddress, size,
                                        hnd->offset, hnd->fd);
         if(err) {
@@ -112,7 +111,7 @@ static int gralloc_unmap(gralloc_module_t const* module,
         int err = -EINVAL;
         void* base = (void*)hnd->base;
         size_t size = hnd->size;
-        sp<IMemAlloc> memalloc = getAllocator(hnd->flags) ;
+        IMemAlloc* memalloc = getAllocator(hnd->flags) ;
         if(memalloc != NULL) {
             err = memalloc->unmap_buffer(base, size, hnd->offset);
             if (err) {
@@ -278,7 +277,7 @@ static int gralloc_map_and_invalidate (gralloc_module_t const* module,
         }
          //Invalidate if reading in software. No need to do this for the metadata
         //buffer as it is only read/written in software.
-        sp<IMemAlloc> memalloc = getAllocator(hnd->flags) ;
+        IMemAlloc* memalloc = getAllocator(hnd->flags) ;
         err = memalloc->clean_buffer((void*)hnd->base,
                                      hnd->size, hnd->offset, hnd->fd,
                                      CACHE_INVALIDATE);
@@ -396,25 +395,7 @@ int gralloc_perform(struct gralloc_module_t const* module,
                     private_handle_t::sNumFds, private_handle_t::sNumInts);
                 hnd->magic = private_handle_t::sMagic;
                 hnd->fd = fd;
-                unsigned int contigFlags = GRALLOC_USAGE_PRIVATE_ADSP_HEAP |
-                    GRALLOC_USAGE_PRIVATE_UI_CONTIG_HEAP |
-                    GRALLOC_USAGE_PRIVATE_SMI_HEAP;
-
-                if (memoryFlags & contigFlags) {
-                    // check if the buffer is a pmem buffer
-                    pmem_region region;
-                    if (ioctl(fd, PMEM_GET_SIZE, &region) < 0)
-                        hnd->flags =  private_handle_t::PRIV_FLAGS_USES_ION;
-                    else
-                        hnd->flags =  private_handle_t::PRIV_FLAGS_USES_PMEM |
-                            private_handle_t::PRIV_FLAGS_DO_NOT_FLUSH;
-                } else {
-                    if (memoryFlags & GRALLOC_USAGE_PRIVATE_ION)
-                        hnd->flags =  private_handle_t::PRIV_FLAGS_USES_ION;
-                    else
-                        hnd->flags =  private_handle_t::PRIV_FLAGS_USES_ASHMEM;
-                }
-
+                hnd->flags =  private_handle_t::PRIV_FLAGS_USES_ION;
                 hnd->size = size;
                 hnd->offset = offset;
                 hnd->base = intptr_t(base) + offset;
