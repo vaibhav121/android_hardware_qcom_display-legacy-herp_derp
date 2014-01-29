@@ -103,9 +103,11 @@ static void *vsync_loop(void *param)
     hwc_procs* proc = (hwc_procs*)ctx->device.reserved_proc[0];
 
     do {
-		    ALOGI("checkpoint 13");
+		    //dont' log. this is an infinite loop >_<
+		    //ALOGI("checkpoint 13");
     usleep(16000);
-        ALOGI("checkpoint 14");
+        //dont' log. this is an infinite loop >_<
+        //ALOGI("checkpoint 14");
     ctx->proc->vsync(ctx->proc, 0, systemTime());
     } while (true);
 
