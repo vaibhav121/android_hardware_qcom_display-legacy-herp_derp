@@ -39,14 +39,19 @@ namespace qhwc {
 
 static void *vsync_loop(void *param)
 {
+	ALOGI("Inside vsync loop");
     const char* vsync_timestamp_fb0 = "/sys/class/graphics/fb0/vsync_event";
     const char* vsync_timestamp_fb1 = "/sys/class/graphics/fb1/vsync_event";
 
+    ALOGI("checkpoint 1");
     hwc_context_t * ctx = reinterpret_cast<hwc_context_t *>(param);
+    ALOGI("checkpoint 2");
     private_module_t* m = reinterpret_cast<private_module_t*>(
                 ctx->mFbDev->common.module);
     char thread_name[64] = "hwcVsyncThread";
+    ALOGI("checkpoint 3");
     prctl(PR_SET_NAME, (unsigned long) &thread_name, 0, 0, 0);
+    ALOGI("checkpoint 4");
     setpriority(PRIO_PROCESS, 0,
                 HAL_PRIORITY_URGENT_DISPLAY + ANDROID_PRIORITY_MORE_FAVORABLE);
 
@@ -63,19 +68,27 @@ static void *vsync_loop(void *param)
     int fb_read = -1; // file used for reading(can be fb0 of fb1)
     bool enabled = false;
 
+    ALOGI("checkpoint 5");
+    
     // Open the primary display vsync_event sysfs node
     fb0_timestamp = open(vsync_timestamp_fb0, O_RDONLY);
+    ALOGI("checkpoint 6");
     if (fb0_timestamp < 0) {
         ALOGE("FATAL:%s:not able to open file:%s, %s",  __FUNCTION__,
                vsync_timestamp_fb0, strerror(errno));
         return NULL;
     }
+        ALOGI("checkpoint 7");
     // Always set to primary display fd
     fb_read = fb0_timestamp;
+        ALOGI("checkpoint 8");
     // Open the secondary display vsync_event sysfs node
     if(ctx->mMDP.hasOverlay) {
+		    ALOGI("checkpoint 9");
         fb1_timestamp = open(vsync_timestamp_fb1, O_RDONLY);
+            ALOGI("checkpoint 10");
         if (fb1_timestamp < 0) {
+			    ALOGI("checkpoint 11");
             ALOGE("FATAL:%s:not able to open file:%s, %s",  __FUNCTION__,
                                         vsync_timestamp_fb1, strerror(errno));
             return NULL;
@@ -86,105 +99,22 @@ static void *vsync_loop(void *param)
     /* Currently read vsync timestamp from drivers
        e.g. VSYNC=41800875994
     */
-
+    ALOGI("checkpoint 12");
     hwc_procs* proc = (hwc_procs*)ctx->device.reserved_proc[0];
 
     do {
-#ifndef NO_HW_VSYNC
-        int hdmiconnected = ctx->mExtDisplay->getExternalDisplay();
-
-        // vsync for primary OR HDMI ?
-        if(ctx->mExtDisplay->isHDMIConfigured() &&
-               (hdmiconnected == EXTERN_DISPLAY_FB1)){
-           fb1_vsync = true;
-           fb_read = fb1_timestamp;
-           ALOGD_IF(VSYNC_DEBUG,"%s: Use fb1 vsync", __FUNCTION__);
-        } else {
-           fb1_vsync = false;
-           fb_read = fb0_timestamp;
-           ALOGD_IF(VSYNC_DEBUG,"%s: Use fb0 vsync", __FUNCTION__);
-        }
-
-
-        pthread_mutex_lock(&ctx->vstate.lock);
-        while (ctx->vstate.enable == false) {
-            if(enabled) {
-                ALOGD_IF(VSYNC_DEBUG, "%s: VSYNC_CTRL disable", __FUNCTION__);
-                int e = 0;
-                if(ioctl(m->framebuffer->fd, MSMFB_OVERLAY_VSYNC_CTRL,
-                                                                &e) < 0) {
-                    ALOGE("%s: vsync control failed for fb0 enabled=%d : %s",
-                                  __FUNCTION__, enabled, strerror(errno));
-                    ret = -errno;
-                }
-                if(fb1_vsync) {
-                    ret = ctx->mExtDisplay->enableHDMIVsync(e);
-                }
-                enabled = false;
-            }
-            pthread_cond_wait(&ctx->vstate.cond, &ctx->vstate.lock);
-        }
-        pthread_mutex_unlock(&ctx->vstate.lock);
-
-        if (!enabled) {
-            ALOGD_IF(VSYNC_DEBUG, "%s: VSYNC_CTRL enable", __FUNCTION__);
-            int e = 1;
-            if(ioctl(m->framebuffer->fd, MSMFB_OVERLAY_VSYNC_CTRL,
-                                                            &e) < 0) {
-                ALOGE("%s: vsync control failed for fb0 enabled=%d : %s",
-                                 __FUNCTION__, enabled, strerror(errno));
-                ret = -errno;
-            }
-            if(fb1_vsync) {
-                ret = ctx->mExtDisplay->enableHDMIVsync(e);
-            }
-            enabled = true;
-        }
-
-        for(int i = 0; i < MAX_RETRY_COUNT; i++) {
-            len = pread(fb_read, vdata, MAX_DATA, 0);
-            if(len < 0 && errno == EAGAIN) {
-                ALOGW("%s: vsync read: EAGAIN, retry (%d/%d).",
-                                        __FUNCTION__, i, MAX_RETRY_COUNT);
-                continue;
-            } else {
-                break;
-            }
-        }
-
-        if (len < 0){
-            ALOGE("%s:not able to read file:%s, %s", __FUNCTION__,
-                   (fb1_vsync) ? vsync_timestamp_fb1 : vsync_timestamp_fb0,
-                                                          strerror(errno));
-            // TODO
-            // continue;
-            // we need to continue from here as we dont have a valid vsync
-            // string, but in the current implementation, the SF needs a
-            // vsync signal to compose
-        }
-
-        // extract timestamp
-        const char *str = vdata;
-        if (!strncmp(str, "VSYNC=", strlen("VSYNC="))) {
-            cur_timestamp = strtoull(str + strlen("VSYNC="), NULL, 0);
-        } else {
-            ALOGE("FATAL:%s:timestamp data not in correct format",
-                                                     __FUNCTION__);
-        }
-        // send timestamp to HAL
-        ALOGD_IF(VSYNC_DEBUG, "%s: timestamp %llu sent to HWC for %s",
-              __FUNCTION__, cur_timestamp, (fb1_vsync) ? "fb1" : "fb0");
-        ctx->proc->vsync(ctx->proc, 0, cur_timestamp);
-#else
+		    ALOGI("checkpoint 13");
     usleep(16000);
+        ALOGI("checkpoint 14");
     ctx->proc->vsync(ctx->proc, 0, systemTime());
-#endif
-      // repeat, whatever, you just did
     } while (true);
 
+    ALOGI("checkpoint 15");
     if(fb0_timestamp > 0)
         close(fb0_timestamp);
+        ALOGI("checkpoint 16");
     fb0_timestamp = -1;
+        ALOGI("checkpoint 17");
     if(ctx->mMDP.hasOverlay) {
         if(fb1_timestamp > 0)
             close(fb1_timestamp);
