@@ -29,6 +29,8 @@
 #ifndef GRALLOC_ALLOCCONTROLLER_H
 #define GRALLOC_ALLOCCONTROLLER_H
 
+#include <utils/RefBase.h>
+
 namespace gralloc {
 
 struct alloc_data;
@@ -38,38 +40,40 @@ class IonAlloc;
 class PmemAdspAlloc;
 #endif
 
-class IAllocController {
+class IAllocController : public android::RefBase {
 
     public:
     /* Allocate using a suitable method
      * Returns the type of buffer allocated
      */
-    virtual int allocate(alloc_data& data, int usage) = 0;
+    //virtual int allocate(alloc_data& data, int usage) = 0;
+    virtual int allocate(alloc_data& data, int usage,
+                         int compositionType) = 0;
 
-    virtual IMemAlloc* getAllocator(int flags) = 0;
+    virtual android::sp<IMemAlloc> getAllocator(int flags) = 0;
 
     virtual ~IAllocController() {};
 
-    static IAllocController* getInstance(void);
+    static android::sp<IAllocController> getInstance(void);
 
     private:
-    static IAllocController* sController;
+    static android::sp<IAllocController> sController;
 
 };
 
 class IonController : public IAllocController {
 
     public:
-    virtual int allocate(alloc_data& data, int usage);
+    virtual int allocate(alloc_data& data, int usage, int compositionType);
 
-    virtual IMemAlloc* getAllocator(int flags);
+    virtual android::sp<IMemAlloc> getAllocator(int flags);
 
     IonController();
 
     private:
-    IonAlloc* mIonAlloc;
+    android::sp<IonAlloc> mIonAlloc;
 #ifdef USE_PMEM_ADSP
-    PmemAdspAlloc* mPmemAlloc;
+    android::sp<PmemAdspAlloc> mPmemAlloc;
 #endif
 
 };

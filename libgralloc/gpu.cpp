@@ -30,11 +30,12 @@
 #include "mdp_version.h"
 
 using namespace gralloc;
+using android::sp;
 
 #define SZ_1M 0x100000
 
 gpu_context_t::gpu_context_t(const private_module_t* module,
-                             IAllocController* alloc_ctrl ) :
+                             sp<IAllocController> alloc_ctrl ) :
     mAllocCtrl(alloc_ctrl)
 {
     // Zero out the alloc_device_t
@@ -59,7 +60,7 @@ int gpu_context_t::gralloc_alloc_framebuffer_locked(size_t size, int usage,
     private_module_t* m = reinterpret_cast<private_module_t*>(common.module);
 
     // we don't support framebuffer allocations with graphics heap flags
-    if (usage & GRALLOC_HEAP_MASK) {
+    if (usage & GRALLOC_USAGE_PRIVATE_ADSP_HEAP) {
         return -EINVAL;
     }
 
@@ -149,7 +150,7 @@ int gpu_context_t::gralloc_alloc_buffer(size_t size, int usage,
     }
     data.size = size;
     data.pHandle = (unsigned int) pHandle;
-    err = mAllocCtrl->allocate(data, usage);
+    err = mAllocCtrl->allocate(data, usage, 0);
 
     if (!err) {
         /* allocate memory for enhancement data */
@@ -161,7 +162,7 @@ int gpu_context_t::gralloc_alloc_buffer(size_t size, int usage,
         eData.pHandle = data.pHandle;
         eData.align = getpagesize();
         int eDataUsage = GRALLOC_USAGE_PRIVATE_SYSTEM_HEAP;
-        int eDataErr = mAllocCtrl->allocate(eData, eDataUsage);
+        int eDataErr = mAllocCtrl->allocate(eData, eDataUsage, 0);
         ALOGE_IF(eDataErr, "gralloc failed for eData err=%s", strerror(-err));
 
         if (usage & GRALLOC_USAGE_PRIVATE_UNSYNCHRONIZED) {
@@ -318,7 +319,7 @@ int gpu_context_t::free_impl(private_handle_t const* hnd) {
         m->bufferMask &= ~(1<<index);
     } else {
         terminateBuffer(&m->base, const_cast<private_handle_t*>(hnd));
-        IMemAlloc* memalloc = mAllocCtrl->getAllocator(hnd->flags);
+        sp<IMemAlloc> memalloc = mAllocCtrl->getAllocator(hnd->flags);
         if(memalloc == NULL) {
             ALOGE("%s: Invalid alloc controller", __FUNCTION__);
             return -EINVAL;

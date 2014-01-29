@@ -43,6 +43,9 @@ enum {
     GRALLOC_USAGE_PRIVATE_UI_CONTIG_HEAP  =       GRALLOC_USAGE_PRIVATE_1,
     /* SYSTEM heap comes from kernel vmalloc,
      * can never be uncached, is not secured*/
+    
+    GRALLOC_USAGE_PRIVATE_SMI_HEAP        =       GRALLOC_USAGE_PRIVATE_2, 
+    
     GRALLOC_USAGE_PRIVATE_SYSTEM_HEAP      =      GRALLOC_USAGE_PRIVATE_2,
     /* MM heap is a carveout heap for video, can be secured*/
     GRALLOC_USAGE_PRIVATE_MM_HEAP         =       GRALLOC_USAGE_PRIVATE_3,
@@ -52,11 +55,19 @@ enum {
     GRALLOC_USAGE_PRIVATE_IOMMU_HEAP      =       0x01000000,
 
     /* ADSP heap is a carveout heap, is not secured*/
-    GRALLOC_USAGE_PRIVATE_CAMERA_HEAP       =       0x01000000,
+    GRALLOC_USAGE_PRIVATE_CAMERA_HEAP       =       0x08000000,
 
     /* Set this for allocating uncached memory (using O_DSYNC)
      * cannot be used with noncontiguous heaps */
     GRALLOC_USAGE_PRIVATE_UNCACHED        =       0x02000000,
+
+    /* This flag needs to be set when using a non-contiguous heap from ION.
+     * If not set, the system heap is assumed to be coming from ashmem
+     */
+    GRALLOC_USAGE_PRIVATE_ION             =       0x00200000,
+    
+    /* Set this flag when you need to avoid mapping the memory in userspace */
+    GRALLOC_USAGE_PRIVATE_DO_NOT_MAP      =       0X00800000,
 
     /* This flag can be set to disable genlock synchronization
      * for the gralloc buffer. If this flag is set the caller
@@ -79,6 +90,9 @@ enum {
 
     /* Close Caption displayed on an external display only */
     GRALLOC_USAGE_PRIVATE_EXTERNAL_CC     =       0x00200000,
+    
+        /* WRITEBACK heap is a carveout heap for writeback, can be secured*/
+    GRALLOC_USAGE_PRIVATE_WRITEBACK_HEAP  =       0x00001000,
 
     /* Use this flag to request content protected buffers. Please note
      * that this flag is different from the GRALLOC_USAGE_PROTECTED flag
@@ -98,12 +112,14 @@ enum {
     GRALLOC_MODULE_PERFORM_GET_STRIDE,
 };
 
-#define GRALLOC_HEAP_MASK   (GRALLOC_USAGE_PRIVATE_UI_CONTIG_HEAP |\
-                             GRALLOC_USAGE_PRIVATE_SYSTEM_HEAP    |\
-                             GRALLOC_USAGE_PRIVATE_IOMMU_HEAP     |\
-                             GRALLOC_USAGE_PRIVATE_MM_HEAP        |\
-                             GRALLOC_USAGE_PRIVATE_CAMERA_HEAP    |\
-                             GRALLOC_USAGE_PRIVATE_ADSP_HEAP)
+//#define GRALLOC_HEAP_MASK (GRALLOC_USAGE_PRIVATE_ADSP_HEAP      |\
+                           GRALLOC_USAGE_PRIVATE_UI_CONTIG_HEAP |\
+                           GRALLOC_USAGE_PRIVATE_SMI_HEAP       |\
+                           GRALLOC_USAGE_PRIVATE_SYSTEM_HEAP    |\
+                           GRALLOC_USAGE_PRIVATE_IOMMU_HEAP     |\
+                           GRALLOC_USAGE_PRIVATE_MM_HEAP        |\
+                           GRALLOC_USAGE_PRIVATE_WRITEBACK_HEAP |\
+                           GRALLOC_USAGE_PRIVATE_CAMERA_HEAP)
 
 #define INTERLACE_MASK 0x80
 #define S3D_FORMAT_MASK 0xFF000
@@ -188,6 +204,7 @@ struct private_handle_t : public native_handle {
             PRIV_FLAGS_EXTERNAL_BLOCK     = 0x00004000,
             // Display this buffer on external as close caption
             PRIV_FLAGS_EXTERNAL_CC        = 0x00008000,
+            PRIV_FLAGS_USES_PMEM_SMI      = 0x00010000,
             PRIV_FLAGS_VIDEO_ENCODER      = 0x00010000,
             PRIV_FLAGS_CAMERA_WRITE       = 0x00020000,
             PRIV_FLAGS_CAMERA_READ        = 0x00040000,

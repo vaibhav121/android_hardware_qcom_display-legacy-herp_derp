@@ -32,7 +32,7 @@
 #include "comptype.h"
 #include <cutils/log.h>
 #include "soc_id.h"
-ANDROID_SINGLETON_STATIC_INSTANCE(qdutils::QCCompositionType);
+//ANDROID_SINGLETON_STATIC_INSTANCE(qdutils::QCCompositionType);
 namespace qdutils {
 
 QCCompositionType::QCCompositionType()

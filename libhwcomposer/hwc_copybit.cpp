@@ -25,7 +25,8 @@
 #include "comptype.h"
 #include "egl_handles.h"
 
-#define  MAX_COPYBIT_RECT 5
+//#define  MAX_COPYBIT_RECT 5
+#define MAX_COPYBIT_RECT 12
 
 namespace qhwc {
 
@@ -115,7 +116,7 @@ bool CopyBit::canUseCopybitForRGB(hwc_context_t *ctx, hwc_display_contents_1_t *
         unsigned int renderArea = getRGBRenderingArea(list);
             ALOGD_IF (DEBUG_COPYBIT, "%s:renderArea %u, fbArea %u",
                                   __FUNCTION__, renderArea, fbArea);
-        if (renderArea < (unsigned int) (ctx->dynThreshold * fbArea)) {
+        if (renderArea <= (unsigned int) (ctx->dynThreshold * fbArea)) {
             return true;
         }
     } else if ((compositionType & qdutils::COMPOSITION_TYPE_MDP)) {
@@ -406,7 +407,7 @@ int  CopyBit::drawLayerUsingCopybit(hwc_context_t *dev, hwc_layer_1_t *layer,
        }
        ALOGD("%s:%d::tmp_w = %d,tmp_h = %d",__FUNCTION__,__LINE__,tmp_w,tmp_h);
 
-       int usage = GRALLOC_USAGE_PRIVATE_MM_HEAP|GRALLOC_USAGE_PRIVATE_UNCACHED;
+       int usage = GRALLOC_USAGE_PRIVATE_MM_HEAP;
        if(dev->mMDP.version < 400)
           usage = GRALLOC_USAGE_PRIVATE_CAMERA_HEAP|GRALLOC_USAGE_PRIVATE_UNCACHED;
        if (0 == alloc_buffer(&tmpHnd, tmp_w, tmp_h, HAL_PIXEL_FORMAT_RGB_565, usage)){

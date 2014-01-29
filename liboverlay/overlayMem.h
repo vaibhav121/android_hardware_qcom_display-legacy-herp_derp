@@ -94,11 +94,12 @@ private:
     uint32_t mNumBuffers;
 
     /* gralloc alloc controller */
-    gralloc::IAllocController* mAlloc;
+    android::sp<gralloc::IAllocController> mAlloc;
 };
 
 //-------------------Inlines-----------------------------------
 
+using android::sp;
 using gralloc::IMemAlloc;
 using gralloc::alloc_data;
 
@@ -136,12 +137,12 @@ inline bool OvMem::open(uint32_t numbufs,
     data.align = getpagesize();
     data.uncached = true;
 
-    err = mAlloc->allocate(data, allocFlags);
+    err = mAlloc->allocate(data, allocFlags, 0);
     //see if we can fallback to other heap
     //we can try MM_HEAP once if it's not secure playback
     if (err != 0 && !isSecure) {
         allocFlags |= GRALLOC_USAGE_PRIVATE_MM_HEAP;
-        err = mAlloc->allocate(data, allocFlags);
+        err = mAlloc->allocate(data, allocFlags, 0);
         if (err != 0) {
             ALOGE(" could not allocate from fallback heap");
             return false;
@@ -167,7 +168,7 @@ inline bool OvMem::close()
         return true;
     }
 
-    IMemAlloc* memalloc = mAlloc->getAllocator(mAllocType);
+    sp<IMemAlloc> memalloc = mAlloc->getAllocator(mAllocType);
     ret = memalloc->free_buffer(mBaseAddr, mBufSz * mNumBuffers, 0, mFd);
     if (ret != 0) {
         ALOGE("OvMem: error freeing buffer");
